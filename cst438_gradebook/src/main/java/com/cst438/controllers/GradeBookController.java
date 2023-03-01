@@ -2,6 +2,7 @@ package com.cst438.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -169,5 +171,22 @@ public class GradeBookController {
 		
 		return assignment;
 	}
+	
+	@PostMapping("/gradebook/add/")
+	@Transactional
+	public void addAssignment(@RequestParam("id") int courseId, @RequestParam("name") String assignmentName, @RequestParam("dueDate") Date dueDate) {
+		
+		Assignment assignment = new Assignment();
+		Course course = courseRepository.findById(courseId).orElse(null);
+		
+		assignment.setName(assignmentName);
+		assignment.setDueDate(dueDate);
+		assignment.setCourse(course);
+		assignment.setNeedsGrading(1);
+		
+		course.getAssignments().add(assignment);
+		assignmentRepository.save(assignment);
+	}
+	
 
 }
