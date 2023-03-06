@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -172,9 +173,9 @@ public class GradeBookController {
 		return assignment;
 	}
 	
-	@PostMapping("/gradebook/add/")
+	@PostMapping("/addAssignment")
 	@Transactional
-	public void addAssignment(@RequestParam("id") int courseId, @RequestParam("name") String assignmentName, @RequestParam("dueDate") Date dueDate) {
+	public void addAssignment(@RequestParam("courseId") int courseId, @RequestParam("name") String assignmentName, @RequestParam("dueDate") Date dueDate) {
 		
 		Assignment assignment = new Assignment();
 		Course course = courseRepository.findById(courseId).orElse(null);
@@ -186,6 +187,26 @@ public class GradeBookController {
 		
 		course.getAssignments().add(assignment);
 		assignmentRepository.save(assignment);
+	}
+	
+	@PutMapping("/changeAssignmentName")
+	@Transactional
+	public void changeAssignmentName(@PathVariable("id") Integer assignmentId, @RequestParam("name") String newAssignmentName) {
+		
+		Assignment assignment = assignmentRepository.findById(assignmentId).orElse(null);
+		assignment.setName(newAssignmentName);
+		assignmentRepository.save(assignment);
+	}
+	
+	@DeleteMapping("/deleteAssignment")
+	@Transactional
+	public void deleteAssignment(@PathVariable int assignment_id) {
+	    Assignment assignment = assignmentRepository.findById(assignment_id)
+	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assignment not found."));
+	    if (!(assignment.getNeedsGrading() == 0)) {
+	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete an assignment with grades.");
+	    }
+	    assignmentRepository.delete(assignment);
 	}
 	
 
