@@ -60,6 +60,14 @@ public class Assignment {
 	public void setCourse(Course course) {
 		this.course = course;
 	}
+	
+	public List<AssignmentGrade> getGrades(){
+		return assignmentGrades;
+	}
+	
+	public AssignmentDTO toDTO() {
+		return new AssignmentDTO(id, course.getCourse_id(), name, dueDate, needsGrading);
+	}
 	@Override
 	public String toString() {
 		return "Assignment [id=" + id + ", course_id=" + course.getCourse_id() + ", name=" + name + ", dueDate=" + dueDate
